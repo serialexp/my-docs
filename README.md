@@ -18,16 +18,34 @@ A CLI that:
 
 ## Installation
 
+### Download binary (easiest)
+
+Download the latest release for your platform from [GitHub Releases](https://github.com/serialexp/my-docs/releases), then:
+
+```bash
+# macOS/Linux
+chmod +x my-docs-*
+sudo mv my-docs-* /usr/local/bin/my-docs
+
+# Verify
+my-docs help
+```
+
+### Using Go
+
 ```bash
 go install github.com/serialexp/my-docs@latest
 ```
 
-Or build from source:
+Note: Requires `~/go/bin` in your PATH.
+
+### Build from source
 
 ```bash
 git clone https://github.com/serialexp/my-docs
 cd my-docs
 go build
+sudo cp my-docs /usr/local/bin/
 ```
 
 ## Usage
