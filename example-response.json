@@ -1,0 +1,150 @@
+{
+	"time": 422,
+	"facets": {
+		"path": {
+			"buckets": [
+				{ "val": "src/", "count": 1601082 },
+				{ "val": "docs/", "count": 399019 },
+				{ "val": "vendor/", "count": 315240 },
+				{ "val": "tests/", "count": 239756 },
+				{ "val": "packages/", "count": 216603 },
+				{ "val": "lib/", "count": 205812 },
+				{ "val": "test/", "count": 195394 },
+				{ "val": "app/", "count": 146550 }
+			]
+		},
+		"repo": {
+			"buckets": [
+				{ "val": "trickest/cve", "count": 84693, "owner_id": "62057399" },
+				{ "val": "torvalds/linux", "count": 37389, "owner_id": "1024025" },
+				{ "val": "llvm/llvm-project", "count": 29815, "owner_id": "17149993" },
+				{
+					"val": "nst/iOS-Runtime-Headers",
+					"count": 17572,
+					"owner_id": "51388"
+				},
+				{ "val": "mongodb/mongo", "count": 13855, "owner_id": "45120" },
+				{ "val": "rust-lang/rust", "count": 13196, "owner_id": "5430905" },
+				{ "val": "nodejs/node", "count": 12058, "owner_id": "9950313" },
+				{ "val": "gitlabhq/gitlabhq", "count": 11919, "owner_id": "1086321" }
+			]
+		},
+		"lang": {
+			"buckets": [
+				{ "val": "Markdown", "count": 1295744 },
+				{ "val": "C", "count": 1013061 },
+				{ "val": "C++", "count": 974477 },
+				{ "val": "Python", "count": 820342 },
+				{ "val": "Go", "count": 660620 },
+				{ "val": "JavaScript", "count": 605074 },
+				{ "val": "Java", "count": 537055 },
+				{ "val": "JSON", "count": 462127 }
+			]
+		}
+	},
+	"hits": {
+		"total": 11971000,
+		"hits": [
+			{
+				"owner_id": "15658638",
+				"repo": "tensorflow/tensorflow",
+				"branch": "master",
+				"path": "tensorflow/lite/core/api/flatbuffer_conversions.cc",
+				"content": {
+					"snippet": "<table class=\"highlight-table\"><tr data-line=\"37\"><td><div class=\"lineno\">37</div></td><td><div class=\"highlight\"><pre><span class=\"c1\">// Utility class for safely <mark>allo</mark>cating POD data. This is useful for avoiding</span></pre></div></td></tr><tr data-line=\"38\"><td><div class=\"lineno\">38</div></td><td><div class=\"highlight\"><pre><span class=\"c1\">// leaks in cases where op params are <mark>allo</mark>cated but fail to propagate to the</span></pre></div></td></tr><tr data-line=\"39\"><td><div class=\"lineno\">39</div></td><td><div class=\"highlight\"><pre><span class=\"c1\">// parsed op data (e.g., when model parameters are invalid).</span></pre></div></td></tr><tr data-line=\"40\"><td><div class=\"lineno\">40</div></td><td><div class=\"highlight\"><pre><span class=\"k\">class</span><span class=\"w\"> </span><span class=\"nc\">SafeBuiltinData<mark>Allo</mark>cator</span><span class=\"w\"> </span><span class=\"p\">{</span></pre></div></td></tr><tr data-line=\"41\"><td><div class=\"lineno\">41</div></td><td><div class=\"highlight\"><pre><span class=\"w\"> </span><span class=\"k\">public</span><span class=\"o\">:</span></pre></div></td></tr><tr data-line=\"42\"><td><div class=\"lineno\">42</div></td><td><div class=\"highlight\"><pre><span class=\"w\">  </span><span class=\"k\">class</span><span class=\"w\"> </span><span class=\"nc\">BuiltinDataDeleter</span><span class=\"w\"> </span><span class=\"p\">{</span></pre></div></td></tr><tr data-line=\"43\"><td><div class=\"lineno\">43</div></td><td><div class=\"highlight\"><pre><span class=\"w\">   </span><span class=\"k\">public</span><span class=\"o\">:</span></pre></div></td></tr><tr data-line=\"44\"><td><div class=\"lineno\">44</div></td><td><div class=\"highlight\"><pre><span class=\"w\">    </span><span class=\"k\">explicit</span><span class=\"w\"> </span><span class=\"n\">BuiltinDataDeleter</span><span class=\"p\">(</span><span class=\"n\">BuiltinData<mark>Allo</mark>cator</span><span class=\"o\">*</span><span class=\"w\"> </span><span class=\"n\"><mark>allo</mark>cator</span><span class=\"p\">)</span></pre></div></td></tr><tr data-line=\"45\"><td><div class=\"lineno\">45</div></td><td><div class=\"highlight\"><pre><span class=\"w\">        </span><span class=\"o\">:</span><span class=\"w\"> </span><span class=\"n\"><mark>allo</mark>cator_</span><span class=\"p\">(</span><span class=\"n\"><mark>allo</mark>cator</span><span class=\"p\">)</span><span class=\"w\"> </span><span class=\"p\">{}</span></pre></div></td></tr></table>"
+				},
+				"total_matches": "100+"
+			},
+			{
+				"owner_id": "15658638",
+				"repo": "tensorflow/tensorflow",
+				"branch": "master",
+				"path": "tensorflow/compiler/mlir/lite/core/api/flatbuffer_conversions.cc",
+				"content": {
+					"snippet": "<table class=\"highlight-table\"><tr data-line=\"276\"><td><div class=\"lineno\">276</div></td><td><div class=\"highlight\"><pre><span class=\"k\">using</span><span class=\"w\"> </span><span class=\"n\">tflite</span><span class=\"o\">::</span><span class=\"n\">BuiltinOperator_ZEROS_LIKE</span><span class=\"p\">;</span></pre></div></td></tr><tr data-line=\"277\"><td><div class=\"lineno\">277</div></td><td><div class=\"highlight\"><pre><span class=\"k\">using</span><span class=\"w\"> </span><span class=\"n\">tflite</span><span class=\"o\">::</span><span class=\"n\">C<mark>allO</mark>nceOptions</span><span class=\"p\">;</span></pre></div></td></tr><tr data-line=\"278\"><td><div class=\"lineno\">278</div></td><td><div class=\"highlight\"><pre><span class=\"k\">using</span><span class=\"w\"> </span><span class=\"n\">tflite</span><span class=\"o\">::</span><span class=\"n\">CombinerType</span><span class=\"p\">;</span></pre><div class=\"jump\"></div></div></td></tr><tr data-line=\"364\"><td><div class=\"lineno\">364</div></td><td><div class=\"highlight\"><pre><span class=\"c1\">// Utility class for safely <mark>allo</mark>cating POD data. This is useful for avoiding</span></pre></div></td></tr><tr data-line=\"365\"><td><div class=\"lineno\">365</div></td><td><div class=\"highlight\"><pre><span class=\"c1\">// leaks in cases where op params are <mark>allo</mark>cated but fail to propagate to the</span></pre></div></td></tr><tr data-line=\"366\"><td><div class=\"lineno\">366</div></td><td><div class=\"highlight\"><pre><span class=\"c1\">// parsed op data (e.g., when model parameters are invalid).</span></pre></div></td></tr><tr data-line=\"367\"><td><div class=\"lineno\">367</div></td><td><div class=\"highlight\"><pre><span class=\"k\">class</span><span class=\"w\"> </span><span class=\"nc\">SafeBuiltinData<mark>Allo</mark>cator</span><span class=\"w\"> </span><span class=\"p\">{</span></pre></div></td></tr><tr data-line=\"368\"><td><div class=\"lineno\">368</div></td><td><div class=\"highlight\"><pre><span class=\"w\"> </span><span class=\"k\">public</span><span class=\"o\">:</span></pre></div></td></tr></table>"
+				},
+				"total_matches": "100+"
+			},
+			{
+				"owner_id": "1024025",
+				"repo": "torvalds/linux",
+				"branch": "master",
+				"path": "drivers/misc/vmw_balloon.c",
+				"content": {
+					"snippet": "<table class=\"highlight-table\"><tr data-line=\"3\"><td><div class=\"lineno\">3</div></td><td><div class=\"highlight\"><pre><span class=\"cm\"> * VMware B<mark>allo</mark>on driver.</span></pre></div></td></tr><tr data-line=\"4\"><td><div class=\"lineno\">4</div></td><td><div class=\"highlight\"><pre><span class=\"cm\"> *</span></pre></div></td></tr><tr data-line=\"5\"><td><div class=\"lineno\">5</div></td><td><div class=\"highlight\"><pre><span class=\"cm\"> * Copyright (C) 2000-2018, VMware, Inc. All Rights Reserved.</span></pre></div></td></tr><tr data-line=\"6\"><td><div class=\"lineno\">6</div></td><td><div class=\"highlight\"><pre><span class=\"cm\"> *</span></pre></div></td></tr><tr data-line=\"7\"><td><div class=\"lineno\">7</div></td><td><div class=\"highlight\"><pre><span class=\"cm\"> * This is VMware physical memory management driver for Linux. The driver</span></pre></div></td></tr><tr data-line=\"8\"><td><div class=\"lineno\">8</div></td><td><div class=\"highlight\"><pre><span class=\"cm\"> * acts like a &quot;b<mark>allo</mark>on&quot; that can be inflated to reclaim physical pages by</span></pre></div></td></tr><tr data-line=\"9\"><td><div class=\"lineno\">9</div></td><td><div class=\"highlight\"><pre><span class=\"cm\"> * reserving them in the guest and invalidating them in the monitor,</span></pre></div></td></tr><tr data-line=\"10\"><td><div class=\"lineno\">10</div></td><td><div class=\"highlight\"><pre><span class=\"cm\"> * freeing up the underlying machine pages so they can be <mark>allo</mark>cated to</span></pre></div></td></tr><tr data-line=\"11\"><td><div class=\"lineno\">11</div></td><td><div class=\"highlight\"><pre><span class=\"cm\"> * other guests.  The b<mark>allo</mark>on can also be deflated to <mark>allo</mark>w the guest to</span></pre></div></td></tr><tr data-line=\"12\"><td><div class=\"lineno\">12</div></td><td><div class=\"highlight\"><pre><span class=\"cm\"> * use more physical memory. Higher level policies can control the sizes</span></pre></div></td></tr></table>"
+				},
+				"total_matches": "100+"
+			},
+			{
+				"owner_id": "15658638",
+				"repo": "tensorflow/tensorflow",
+				"branch": "master",
+				"path": "tensorflow/core/common_runtime/gpu/gpu_process_state.cc",
+				"content": {
+					"snippet": "<table class=\"highlight-table\"><tr data-line=\"31\"><td><div class=\"lineno\">31</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&quot;xla/stream_executor/gpu/gpu_init.h&quot;</span></pre></div></td></tr><tr data-line=\"32\"><td><div class=\"lineno\">32</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&quot;xla/stream_executor/integrations/device_mem_<mark>allo</mark>cator.h&quot;</span></pre></div></td></tr><tr data-line=\"33\"><td><div class=\"lineno\">33</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&quot;xla/stream_executor/integrations/stream_executor_<mark>allo</mark>cator.h&quot;</span></pre></div></td></tr><tr data-line=\"34\"><td><div class=\"lineno\">34</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&quot;xla/stream_executor/stream_executor.h&quot;</span></pre></div></td></tr><tr data-line=\"35\"><td><div class=\"lineno\">35</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&quot;xla/tsl/framework/<mark>allo</mark>cator.h&quot;</span></pre></div></td></tr><tr data-line=\"36\"><td><div class=\"lineno\">36</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&quot;xla/tsl/framework/bfc_<mark>allo</mark>cator.h&quot;</span></pre></div></td></tr><tr data-line=\"37\"><td><div class=\"lineno\">37</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&quot;xla/tsl/framework/device_id.h&quot;</span></pre><div class=\"jump\"></div></div></td></tr><tr data-line=\"43\"><td><div class=\"lineno\">43</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&quot;tensorflow/core/common_runtime/gpu/gpu_bfc_<mark>allo</mark>cator.h&quot;</span></pre></div></td></tr><tr data-line=\"44\"><td><div class=\"lineno\">44</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&quot;tensorflow/core/common_runtime/gpu/gpu_cudam<mark>allo</mark>c_<mark>allo</mark>cator.h&quot;</span></pre></div></td></tr></table>"
+				},
+				"total_matches": "100+"
+			},
+			{
+				"owner_id": "1024025",
+				"repo": "torvalds/linux",
+				"branch": "master",
+				"path": "drivers/android/binder_alloc.c",
+				"content": {
+					"snippet": "<table class=\"highlight-table\"><tr data-line=\"1\"><td><div class=\"lineno\">1</div></td><td><div class=\"highlight\"><pre><span class=\"c1\">// SPDX-License-Identifier: GPL-2.0-only</span></pre></div></td></tr><tr data-line=\"2\"><td><div class=\"lineno\">2</div></td><td><div class=\"highlight\"><pre><span class=\"cm\">/* binder_<mark>allo</mark>c.c</span></pre><div class=\"jump\"></div></div></td></tr><tr data-line=\"16\"><td><div class=\"lineno\">16</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&lt;linux/seq_file.h&gt;</span></pre></div></td></tr><tr data-line=\"17\"><td><div class=\"lineno\">17</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&lt;linux/vm<mark>allo</mark>c.h&gt;</span></pre></div></td></tr><tr data-line=\"18\"><td><div class=\"lineno\">18</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&lt;linux/slab.h&gt;</span></pre><div class=\"jump\"></div></div></td></tr><tr data-line=\"26\"><td><div class=\"lineno\">26</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&lt;kunit/visibility.h&gt;</span></pre></div></td></tr><tr data-line=\"27\"><td><div class=\"lineno\">27</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&quot;binder_<mark>allo</mark>c.h&quot;</span></pre></div></td></tr><tr data-line=\"28\"><td><div class=\"lineno\">28</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&quot;binder_trace.h&quot;</span></pre></div></td></tr></table>"
+				},
+				"total_matches": "100+"
+			},
+			{
+				"owner_id": "15658638",
+				"repo": "tensorflow/tensorflow",
+				"branch": "master",
+				"path": "tensorflow/compiler/mlir/lite/core/api/flatbuffer_conversions.h",
+				"content": {
+					"snippet": "<table class=\"highlight-table\"><tr data-line=\"39\"><td><div class=\"lineno\">39</div></td><td><div class=\"highlight\"><pre><span class=\"c1\">// Interface class for builtin data <mark>allo</mark>cations.</span></pre></div></td></tr><tr data-line=\"40\"><td><div class=\"lineno\">40</div></td><td><div class=\"highlight\"><pre><span class=\"k\">class</span><span class=\"w\"> </span><span class=\"nc\">BuiltinData<mark>Allo</mark>cator</span><span class=\"w\"> </span><span class=\"p\">{</span></pre></div></td></tr><tr data-line=\"41\"><td><div class=\"lineno\">41</div></td><td><div class=\"highlight\"><pre><span class=\"w\"> </span><span class=\"k\">public</span><span class=\"o\">:</span></pre></div></td></tr><tr data-line=\"42\"><td><div class=\"lineno\">42</div></td><td><div class=\"highlight\"><pre><span class=\"w\">  </span><span class=\"k\">virtual</span><span class=\"w\"> </span><span class=\"kt\">void</span><span class=\"o\">*</span><span class=\"w\"> </span><span class=\"n\"><mark>Allo</mark>cate</span><span class=\"p\">(</span><span class=\"kt\">size_t</span><span class=\"w\"> </span><span class=\"n\">size</span><span class=\"p\">,</span><span class=\"w\"> </span><span class=\"kt\">size_t</span><span class=\"w\"> </span><span class=\"n\">alignment_hint</span><span class=\"p\">)</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"mi\">0</span><span class=\"p\">;</span></pre></div></td></tr><tr data-line=\"43\"><td><div class=\"lineno\">43</div></td><td><div class=\"highlight\"><pre><span class=\"w\">  </span><span class=\"k\">virtual</span><span class=\"w\"> </span><span class=\"kt\">void</span><span class=\"w\"> </span><span class=\"nf\">De<mark>allo</mark>cate</span><span class=\"p\">(</span><span class=\"kt\">void</span><span class=\"o\">*</span><span class=\"w\"> </span><span class=\"n\">data</span><span class=\"p\">)</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"mi\">0</span><span class=\"p\">;</span></pre></div></td></tr><tr data-line=\"44\"><td><div class=\"lineno\">44</div></td><td><div class=\"highlight\"><pre><br/></pre></div></td></tr><tr data-line=\"45\"><td><div class=\"lineno\">45</div></td><td><div class=\"highlight\"><pre><span class=\"w\">  </span><span class=\"c1\">// <mark>Allo</mark>cate a structure, but make sure it is a POD structure that doesn&#39;t</span></pre></div></td></tr><tr data-line=\"46\"><td><div class=\"lineno\">46</div></td><td><div class=\"highlight\"><pre><span class=\"w\">  </span><span class=\"c1\">// require constructors to run. The reason we do this, is that Interpreter&#39;s C</span></pre></div></td></tr><tr data-line=\"47\"><td><div class=\"lineno\">47</div></td><td><div class=\"highlight\"><pre><span class=\"w\">  </span><span class=\"c1\">// extension part will take ownership so destructors  will not be run during</span></pre></div></td></tr><tr data-line=\"48\"><td><div class=\"lineno\">48</div></td><td><div class=\"highlight\"><pre><span class=\"w\">  </span><span class=\"c1\">// de<mark>allo</mark>cation.</span></pre></div></td></tr></table>"
+				},
+				"total_matches": "100+"
+			},
+			{
+				"owner_id": "15658638",
+				"repo": "tensorflow/tensorflow",
+				"branch": "master",
+				"path": "tensorflow/lite/core/api/flatbuffer_conversions.h",
+				"content": {
+					"snippet": "<table class=\"highlight-table\"><tr data-line=\"33\"><td><div class=\"lineno\">33</div></td><td><div class=\"highlight\"><pre><span class=\"c1\">// Interface class for builtin data <mark>allo</mark>cations.</span></pre></div></td></tr><tr data-line=\"34\"><td><div class=\"lineno\">34</div></td><td><div class=\"highlight\"><pre><span class=\"k\">class</span><span class=\"w\"> </span><span class=\"nc\">BuiltinData<mark>Allo</mark>cator</span><span class=\"w\"> </span><span class=\"p\">{</span></pre></div></td></tr><tr data-line=\"35\"><td><div class=\"lineno\">35</div></td><td><div class=\"highlight\"><pre><span class=\"w\"> </span><span class=\"k\">public</span><span class=\"o\">:</span></pre></div></td></tr><tr data-line=\"36\"><td><div class=\"lineno\">36</div></td><td><div class=\"highlight\"><pre><span class=\"w\">  </span><span class=\"k\">virtual</span><span class=\"w\"> </span><span class=\"kt\">void</span><span class=\"o\">*</span><span class=\"w\"> </span><span class=\"n\"><mark>Allo</mark>cate</span><span class=\"p\">(</span><span class=\"kt\">size_t</span><span class=\"w\"> </span><span class=\"n\">size</span><span class=\"p\">,</span><span class=\"w\"> </span><span class=\"kt\">size_t</span><span class=\"w\"> </span><span class=\"n\">alignment_hint</span><span class=\"p\">)</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"mi\">0</span><span class=\"p\">;</span></pre></div></td></tr><tr data-line=\"37\"><td><div class=\"lineno\">37</div></td><td><div class=\"highlight\"><pre><span class=\"w\">  </span><span class=\"k\">virtual</span><span class=\"w\"> </span><span class=\"kt\">void</span><span class=\"w\"> </span><span class=\"nf\">De<mark>allo</mark>cate</span><span class=\"p\">(</span><span class=\"kt\">void</span><span class=\"o\">*</span><span class=\"w\"> </span><span class=\"n\">data</span><span class=\"p\">)</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"mi\">0</span><span class=\"p\">;</span></pre></div></td></tr><tr data-line=\"38\"><td><div class=\"lineno\">38</div></td><td><div class=\"highlight\"><pre><br/></pre></div></td></tr><tr data-line=\"39\"><td><div class=\"lineno\">39</div></td><td><div class=\"highlight\"><pre><span class=\"w\">  </span><span class=\"c1\">// <mark>Allo</mark>cate a structure, but make sure it is a POD structure that doesn&#39;t</span></pre></div></td></tr><tr data-line=\"40\"><td><div class=\"lineno\">40</div></td><td><div class=\"highlight\"><pre><span class=\"w\">  </span><span class=\"c1\">// require constructors to run. The reason we do this, is that Interpreter&#39;s C</span></pre></div></td></tr><tr data-line=\"41\"><td><div class=\"lineno\">41</div></td><td><div class=\"highlight\"><pre><span class=\"w\">  </span><span class=\"c1\">// extension part will take ownership so destructors  will not be run during</span></pre></div></td></tr><tr data-line=\"42\"><td><div class=\"lineno\">42</div></td><td><div class=\"highlight\"><pre><span class=\"w\">  </span><span class=\"c1\">// de<mark>allo</mark>cation.</span></pre></div></td></tr></table>"
+				},
+				"total_matches": "100+"
+			},
+			{
+				"owner_id": "1024025",
+				"repo": "torvalds/linux",
+				"branch": "master",
+				"path": "include/linux/slab.h",
+				"content": {
+					"snippet": "<table class=\"highlight-table\"><tr data-line=\"6\"><td><div class=\"lineno\">6</div></td><td><div class=\"highlight\"><pre><span class=\"cm\"> * \tCleaned up and restructured to ease the addition of alternative</span></pre></div></td></tr><tr data-line=\"7\"><td><div class=\"lineno\">7</div></td><td><div class=\"highlight\"><pre><span class=\"cm\"> * \timplementations of SLAB <mark>allo</mark>cators.</span></pre></div></td></tr><tr data-line=\"8\"><td><div class=\"lineno\">8</div></td><td><div class=\"highlight\"><pre><span class=\"cm\"> * (C) Linux Foundation 2008-2013</span></pre></div></td></tr><tr data-line=\"9\"><td><div class=\"lineno\">9</div></td><td><div class=\"highlight\"><pre><span class=\"cm\"> *      Unified interface for all slab <mark>allo</mark>cators</span></pre><div class=\"jump\"></div></div></td></tr><tr data-line=\"28\"><td><div class=\"lineno\">28</div></td><td><div class=\"highlight\"><pre><span class=\"w\">\t</span><span class=\"n\">_SLAB_POISON</span><span class=\"p\">,</span></pre></div></td></tr><tr data-line=\"29\"><td><div class=\"lineno\">29</div></td><td><div class=\"highlight\"><pre><span class=\"w\">\t</span><span class=\"n\">_SLAB_KM<mark>ALLO</mark>C</span><span class=\"p\">,</span></pre></div></td></tr><tr data-line=\"30\"><td><div class=\"lineno\">30</div></td><td><div class=\"highlight\"><pre><span class=\"w\">\t</span><span class=\"n\">_SLAB_HWCACHE_ALIGN</span><span class=\"p\">,</span></pre><div class=\"jump\"></div></div></td></tr><tr data-line=\"73\"><td><div class=\"lineno\">73</div></td><td><div class=\"highlight\"><pre><span class=\"cm\">/* DEBUG: Perform (expensive) checks on <mark>allo</mark>c/free */</span></pre></div></td></tr></table>"
+				},
+				"total_matches": "100+"
+			},
+			{
+				"owner_id": "1024025",
+				"repo": "torvalds/linux",
+				"branch": "master",
+				"path": "drivers/virtio/virtio_balloon.c",
+				"content": {
+					"snippet": "<table class=\"highlight-table\"><tr data-line=\"3\"><td><div class=\"lineno\">3</div></td><td><div class=\"highlight\"><pre><span class=\"cm\"> * Virtio b<mark>allo</mark>on implementation, inspired by Dor Laor and Marcelo</span></pre></div></td></tr><tr data-line=\"4\"><td><div class=\"lineno\">4</div></td><td><div class=\"highlight\"><pre><span class=\"cm\"> * Tosatti&#39;s implementations.</span></pre><div class=\"jump\"></div></div></td></tr><tr data-line=\"10\"><td><div class=\"lineno\">10</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&lt;linux/virtio_b<mark>allo</mark>on.h&gt;</span></pre></div></td></tr><tr data-line=\"11\"><td><div class=\"lineno\">11</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&lt;linux/swap.h&gt;</span></pre></div></td></tr><tr data-line=\"12\"><td><div class=\"lineno\">12</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&lt;linux/workqueue.h&gt;</span></pre></div></td></tr><tr data-line=\"13\"><td><div class=\"lineno\">13</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&lt;linux/delay.h&gt;</span></pre></div></td></tr><tr data-line=\"14\"><td><div class=\"lineno\">14</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&lt;linux/slab.h&gt;</span></pre></div></td></tr><tr data-line=\"15\"><td><div class=\"lineno\">15</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&lt;linux/module.h&gt;</span></pre></div></td></tr><tr data-line=\"16\"><td><div class=\"lineno\">16</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&lt;linux/b<mark>allo</mark>on_compaction.h&gt;</span></pre></div></td></tr></table>"
+				},
+				"total_matches": "100+"
+			},
+			{
+				"owner_id": "1024025",
+				"repo": "torvalds/linux",
+				"branch": "master",
+				"path": "fs/xfs/libxfs/xfs_alloc.c",
+				"content": {
+					"snippet": "<table class=\"highlight-table\"><tr data-line=\"16\"><td><div class=\"lineno\">16</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&quot;xfs_rmap.h&quot;</span></pre></div></td></tr><tr data-line=\"17\"><td><div class=\"lineno\">17</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&quot;xfs_<mark>allo</mark>c_btree.h&quot;</span></pre></div></td></tr><tr data-line=\"18\"><td><div class=\"lineno\">18</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&quot;xfs_<mark>allo</mark>c.h&quot;</span></pre></div></td></tr><tr data-line=\"19\"><td><div class=\"lineno\">19</div></td><td><div class=\"highlight\"><pre><span class=\"cp\">#include</span><span class=\"w\"> </span><span class=\"cpf\">&quot;xfs_extent_busy.h&quot;</span></pre><div class=\"jump\"></div></div></td></tr><tr data-line=\"34\"><td><div class=\"lineno\">34</div></td><td><div class=\"highlight\"><pre><span class=\"k\">struct</span><span class=\"w\"> </span><span class=\"nc\">workqueue_struct</span><span class=\"w\"> </span><span class=\"o\">*</span><span class=\"n\">xfs_<mark>allo</mark>c_wq</span><span class=\"p\">;</span></pre><div class=\"jump\"></div></div></td></tr><tr data-line=\"67\"><td><div class=\"lineno\">67</div></td><td><div class=\"highlight\"><pre><span class=\"n\">xfs_extlen_t</span></pre></div></td></tr><tr data-line=\"68\"><td><div class=\"lineno\">68</div></td><td><div class=\"highlight\"><pre><span class=\"nf\">xfs_pre<mark>allo</mark>c_blocks</span><span class=\"p\">(</span></pre></div></td></tr><tr data-line=\"69\"><td><div class=\"lineno\">69</div></td><td><div class=\"highlight\"><pre><span class=\"w\">\t</span><span class=\"k\">struct</span><span class=\"w\"> </span><span class=\"nc\">xfs_mount</span><span class=\"w\">\t</span><span class=\"o\">*</span><span class=\"n\">mp</span><span class=\"p\">)</span></pre></div></td></tr></table>"
+				},
+				"total_matches": "100+"
+			}
+		]
+	}
+}
