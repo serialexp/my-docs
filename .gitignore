@@ -1,5 +1,6 @@
 # Compiled binary
 my-docs
 
-# Claude Code local config
-.claude/
+# Claude Code local settings (but keep CLAUDE.md)
+.claude/*
+!.claude/CLAUDE.md
