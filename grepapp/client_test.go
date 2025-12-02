@@ -85,8 +85,11 @@ func TestParseResponse(t *testing.T) {
 func TestBuildURL(t *testing.T) {
 	t.Run("simple query", func(t *testing.T) {
 		got := BuildURL("test", "")
-		if got != "https://grep.app/api/search?q=test" {
-			t.Errorf("BuildURL() = %q", got)
+		if !strings.Contains(got, "q=test") {
+			t.Errorf("BuildURL() missing q param: %q", got)
+		}
+		if !strings.Contains(got, "regexp=true") {
+			t.Errorf("BuildURL() missing regexp param: %q", got)
 		}
 	})
 

@@ -61,6 +61,7 @@ type Match struct {
 func BuildURL(query, repo string) string {
 	params := url.Values{}
 	params.Set("q", query)
+	params.Set("regexp", "true")
 	if repo != "" {
 		params.Set("f.repo", repo)
 	}

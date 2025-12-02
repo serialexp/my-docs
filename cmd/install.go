@@ -25,33 +25,29 @@ Use ` + "`my-docs`" + ` when you need to:
 
 ### Workflow
 
-1. **First time using a library?** Set up an alias:
+1. **First time using a library?** Find available repos:
    ` + "`my-docs find opentelemetry`" + ` → discover available repos
-   ` + "`my-docs alias otel open-telemetry/opentelemetry-collector`" + ` → save for quick access
 
 2. **Need to find something?** Search the repo:
-   ` + "`my-docs search otel \"processor.*metrics\"`" + ` → find metrics processor code
+   ` + "`my-docs search open-telemetry/opentelemetry-collector \"processor.*metrics\"`" + ` → find metrics processor code
    Returns: file paths with line numbers showing matches
 
 3. **Want to read a specific file?** Fetch it directly:
-   ` + "`my-docs cat otel docs/configuration.md`" + ` → read configuration docs
-   ` + "`my-docs cat otel processor/metrics/factory.go`" + ` → read source code
+   ` + "`my-docs cat open-telemetry/opentelemetry-collector docs/configuration.md`" + ` → read configuration docs
+   ` + "`my-docs cat open-telemetry/opentelemetry-collector processor/metrics/factory.go`" + ` → read source code
 
 ### Available commands
 
 - ` + "`my-docs find <query>`" + ` - Search GitHub for repos matching query
-- ` + "`my-docs alias <name> <owner/repo>`" + ` - Save repo with a short alias
-- ` + "`my-docs search <repo> <pattern>`" + ` - Search repo contents (supports regex)
-- ` + "`my-docs cat <repo> <path>`" + ` - Fetch and display file contents
-- ` + "`my-docs list`" + ` - Show all configured aliases
-- ` + "`my-docs remove <name>`" + ` - Remove an alias
+- ` + "`my-docs search [owner/repo] <pattern>`" + ` - Search repo contents (supports regex). Repo should be in owner/repo format, or omitted to search all repos
+- ` + "`my-docs cat <owner/repo> <path>`" + ` - Fetch and display file contents
 
 ### Tips
 
-- Use search to find examples: ` + "`my-docs search otel \"prometheusreceiver\"`" + `
-- Use cat to read docs: ` + "`my-docs cat otel README.md`" + `
-- Regex patterns work: ` + "`my-docs search otel \"func.*Start\"`" + `
-- Check what's aliased: ` + "`my-docs list`" + `
+- Search specific repo: ` + "`my-docs search grafana/alloy \"exporter\"`" + `
+- Search all repos: ` + "`my-docs search \"specific_function_name\"`" + `
+- Use cat to read docs: ` + "`my-docs cat grafana/alloy README.md`" + `
+- Regex patterns work: ` + "`my-docs search grafana/alloy \"func.*Start\"`" + `
 `
 
 func UpdateClaudeMdSection(content, instructions string) string {

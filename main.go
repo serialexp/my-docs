@@ -7,10 +7,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
+	"strings"
 
 	"github.com/bartriepe/my-docs/cmd"
-	"github.com/bartriepe/my-docs/config"
 	"github.com/bartriepe/my-docs/github"
 	"github.com/bartriepe/my-docs/grepapp"
 )
@@ -25,14 +24,6 @@ func main() {
 	args := os.Args[2:]
 
 	switch command {
-	case "list":
-		runList()
-	case "alias":
-		runAlias(args)
-	case "remove":
-		runRemove(args)
-	case "config":
-		runConfig()
 	case "find":
 		runFind(args)
 	case "search":
@@ -57,93 +48,12 @@ Usage:
   my-docs <command> [arguments]
 
 Commands:
-  search <repo> <pattern>    Search repo via grep.app
-  cat <repo> <path>          Fetch and display file from GitHub
-  find <query>               Search for repos by name
-  list                       Show all configured repo aliases
-  alias <name> <owner/repo>  Create alias for a repo
-  remove <name>              Remove a repo alias
-  config                     Show config file path
-  install                    Install instructions into ~/.claude/CLAUDE.md`)
+  search [owner/repo] <pattern>  Search repo via grep.app (omit repo to search all)
+  cat <owner/repo> <path>        Fetch and display file from GitHub
+  find <query>                   Search for repos by name
+  install                        Install instructions into ~/.claude/CLAUDE.md`)
 }
 
-func loadConfig() *config.Config {
-	path, err := config.DefaultPath()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
-	}
-	cfg, err := config.Load(path)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error loading config: %v\n", err)
-		os.Exit(1)
-	}
-	return cfg
-}
-
-func saveConfig(cfg *config.Config) {
-	path, err := config.DefaultPath()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
-	}
-	if err := config.Save(path, cfg); err != nil {
-		fmt.Fprintf(os.Stderr, "error saving config: %v\n", err)
-		os.Exit(1)
-	}
-}
-
-func runList() {
-	cfg := loadConfig()
-	entries := cmd.List(cfg)
-	if len(entries) == 0 {
-		fmt.Println("No repos configured. Use 'my-docs alias <name> <owner/repo>' to add one.")
-		return
-	}
-	sort.Slice(entries, func(i, j int) bool {
-		return entries[i].Name < entries[j].Name
-	})
-	for _, e := range entries {
-		fmt.Printf("%s\t%s\n", e.Name, e.Repo)
-	}
-}
-
-func runAlias(args []string) {
-	if len(args) != 2 {
-		fmt.Fprintln(os.Stderr, "usage: my-docs alias <name> <owner/repo>")
-		os.Exit(1)
-	}
-	cfg := loadConfig()
-	if err := cmd.Alias(cfg, args[0], args[1]); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
-	}
-	saveConfig(cfg)
-	fmt.Printf("Aliased %s -> %s\n", args[0], args[1])
-}
-
-func runRemove(args []string) {
-	if len(args) != 1 {
-		fmt.Fprintln(os.Stderr, "usage: my-docs remove <name>")
-		os.Exit(1)
-	}
-	cfg := loadConfig()
-	if err := cmd.Remove(cfg, args[0]); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
-	}
-	saveConfig(cfg)
-	fmt.Printf("Removed alias %s\n", args[0])
-}
-
-func runConfig() {
-	path, err := config.DefaultPath()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
-	}
-	fmt.Println(path)
-}
 
 func runFind(args []string) {
 	if len(args) != 1 {
@@ -165,17 +75,27 @@ func runFind(args []string) {
 }
 
 func runSearch(args []string) {
-	if len(args) != 2 {
-		fmt.Fprintln(os.Stderr, "usage: my-docs search <repo> <pattern>")
+	if len(args) < 1 || len(args) > 2 {
+		fmt.Fprintln(os.Stderr, "usage: my-docs search [owner/repo] <pattern>")
 		os.Exit(1)
 	}
-	cfg := loadConfig()
-	repo, err := cmd.Resolve(cfg, args[0])
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+
+	var repo, pattern string
+	if len(args) == 1 {
+		// No repo specified, search across all repos
+		pattern = args[0]
+		repo = ""
+	} else {
+		// Repo specified in owner/repo format
+		repo = args[0]
+		if !strings.Contains(repo, "/") {
+			fmt.Fprintf(os.Stderr, "error: invalid repo format %q: must be owner/repo\n", repo)
+			os.Exit(1)
+		}
+		pattern = args[1]
 	}
-	resp, err := grepapp.Search(args[1], repo)
+
+	resp, err := grepapp.Search(pattern, repo)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
@@ -194,13 +114,12 @@ func runSearch(args []string) {
 
 func runCat(args []string) {
 	if len(args) != 2 {
-		fmt.Fprintln(os.Stderr, "usage: my-docs cat <repo> <path>")
+		fmt.Fprintln(os.Stderr, "usage: my-docs cat <owner/repo> <path>")
 		os.Exit(1)
 	}
-	cfg := loadConfig()
-	repo, err := cmd.Resolve(cfg, args[0])
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+	repo := args[0]
+	if !strings.Contains(repo, "/") {
+		fmt.Fprintf(os.Stderr, "error: invalid repo format %q: must be owner/repo\n", repo)
 		os.Exit(1)
 	}
 	content, err := github.FetchFile(repo, args[1])
