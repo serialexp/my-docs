@@ -10,13 +10,17 @@ import (
 )
 
 type Config struct {
-	Repos map[string]string `json:"repos"`
+	Repos  map[string]string `json:"repos"`
+	Crates map[string]string `json:"crates,omitempty"`
 }
 
 func Load(path string) (*Config, error) {
 	data, err := os.ReadFile(path)
 	if os.IsNotExist(err) {
-		return &Config{Repos: make(map[string]string)}, nil
+		return &Config{
+			Repos:  make(map[string]string),
+			Crates: make(map[string]string),
+		}, nil
 	}
 	if err != nil {
 		return nil, err
@@ -28,6 +32,9 @@ func Load(path string) (*Config, error) {
 	}
 	if cfg.Repos == nil {
 		cfg.Repos = make(map[string]string)
+	}
+	if cfg.Crates == nil {
+		cfg.Crates = make(map[string]string)
 	}
 	return &cfg, nil
 }

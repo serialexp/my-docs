@@ -66,6 +66,10 @@ my-docs search alloy "prometheus.exporter"
 # Read specific files
 my-docs cat alloy README.md
 
+# Look up Rust crate symbols
+my-docs rust alacritty_terminal KeyboardModes
+# (outputs the file containing KeyboardModes, or lists files if multiple matches)
+
 # List configured aliases
 my-docs list
 
@@ -87,6 +91,7 @@ my-docs install
 | `alias <name> <owner/repo>` | Create alias for a repo |
 | `search <repo> <pattern>` | Search repo via grep.app |
 | `cat <repo> <path>` | Fetch and display file from GitHub |
+| `rust <crate> <symbol>` | Look up a Rust crate symbol and show its source |
 | `list` | Show all configured repo aliases |
 | `remove <name>` | Remove a repo alias |
 | `config` | Show config file path |

@@ -41,6 +41,16 @@ Use ` + "`my-docs`" + ` when you need to:
 - ` + "`my-docs find <query>`" + ` - Search GitHub for repos matching query
 - ` + "`my-docs search [owner/repo] <pattern>`" + ` - Search repo contents (supports regex). Repo should be in owner/repo format, or omitted to search all repos
 - ` + "`my-docs cat <owner/repo> <path>`" + ` - Fetch and display file contents
+- ` + "`my-docs rust <crate> <symbol>`" + ` - Look up a Rust crate symbol and show its source
+
+### Rust Crates
+
+For Rust crates, use the ` + "`rust`" + ` command to look up symbols directly:
+` + "```" + `
+my-docs rust alacritty_terminal KeyboardModes
+` + "```" + `
+This automatically resolves the crate to its GitHub repository (cached for future use).
+If the symbol appears in multiple files, you'll get a list of cat commands to run.
 
 ### Tips
 

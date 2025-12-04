@@ -83,3 +83,47 @@ func TestDefaultPath(t *testing.T) {
 		t.Errorf("DefaultPath() = %q, want config.json filename", path)
 	}
 }
+
+func TestLoadConfig_NonExistent_InitializesCrates(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "config.json")
+
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load() error = %v, want nil", err)
+	}
+	if cfg.Crates == nil {
+		t.Error("Load() Crates is nil, want empty map")
+	}
+}
+
+func TestSaveAndLoad_WithCrates(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "config.json")
+
+	cfg := &Config{
+		Repos: map[string]string{
+			"alloy": "grafana/alloy",
+		},
+		Crates: map[string]string{
+			"alacritty_terminal": "alacritty/alacritty",
+			"serde":              "serde-rs/serde",
+		},
+	}
+
+	if err := Save(path, cfg); err != nil {
+		t.Fatalf("Save() error = %v", err)
+	}
+
+	loaded, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load() error = %v", err)
+	}
+
+	if len(loaded.Crates) != 2 {
+		t.Errorf("Load() Crates has %d entries, want 2", len(loaded.Crates))
+	}
+	if loaded.Crates["alacritty_terminal"] != "alacritty/alacritty" {
+		t.Errorf("Load() Crates[alacritty_terminal] = %q, want %q", loaded.Crates["alacritty_terminal"], "alacritty/alacritty")
+	}
+}

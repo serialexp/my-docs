@@ -10,6 +10,8 @@ import (
 	"strings"
 
 	"github.com/bartriepe/my-docs/cmd"
+	"github.com/bartriepe/my-docs/config"
+	"github.com/bartriepe/my-docs/cratesio"
 	"github.com/bartriepe/my-docs/github"
 	"github.com/bartriepe/my-docs/grepapp"
 )
@@ -30,6 +32,8 @@ func main() {
 		runSearch(args)
 	case "cat":
 		runCat(args)
+	case "rust":
+		runRust(args)
 	case "install":
 		runInstall()
 	case "help", "-h", "--help":
@@ -51,9 +55,35 @@ Commands:
   search [owner/repo] <pattern>  Search repo via grep.app (omit repo to search all)
   cat <owner/repo> <path>        Fetch and display file from GitHub
   find <query>                   Search for repos by name
+  rust <crate> <symbol>          Look up a Rust crate symbol and show its source
   install                        Install instructions into ~/.claude/CLAUDE.md`)
 }
 
+func loadConfig() *config.Config {
+	path, err := config.DefaultPath()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+	cfg, err := config.Load(path)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error loading config: %v\n", err)
+		os.Exit(1)
+	}
+	return cfg
+}
+
+func saveConfig(cfg *config.Config) {
+	path, err := config.DefaultPath()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+	if err := config.Save(path, cfg); err != nil {
+		fmt.Fprintf(os.Stderr, "error saving config: %v\n", err)
+		os.Exit(1)
+	}
+}
 
 func runFind(args []string) {
 	if len(args) != 1 {
@@ -128,6 +158,63 @@ func runCat(args []string) {
 		os.Exit(1)
 	}
 	fmt.Print(content)
+}
+
+func runRust(args []string) {
+	if len(args) != 2 {
+		fmt.Fprintln(os.Stderr, "usage: my-docs rust <crate> <symbol>")
+		os.Exit(1)
+	}
+	crateName := args[0]
+	symbol := args[1]
+
+	cfg := loadConfig()
+
+	// Check cache first
+	repo, cached := cfg.Crates[crateName]
+	if !cached {
+		// Look up on crates.io
+		resp, err := cratesio.Lookup(crateName)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
+		repo, err = cratesio.ExtractGitHubRepo(resp)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
+		// Cache the result
+		cfg.Crates[crateName] = repo
+		saveConfig(cfg)
+	}
+
+	// Search for the symbol in the repo
+	resp, err := grepapp.Search(symbol, repo)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	if len(resp.Hits.Hits) == 0 {
+		fmt.Print(cmd.FormatNoMatches(symbol, crateName))
+		os.Exit(1)
+	}
+
+	files := cmd.CollectMatchingFiles(resp.Hits.Hits)
+
+	if len(files) == 1 {
+		// Single file - fetch and output it
+		content, err := github.FetchFile(repo, files[0])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Print(content)
+	} else {
+		// Multiple files - show cat commands
+		fmt.Print(cmd.FormatMultipleMatches(symbol, repo, files))
+	}
 }
 
 func runInstall() {
