@@ -18,18 +18,13 @@ A CLI that:
 
 ## Installation
 
-### Download binary (easiest)
-
-Download the latest release for your platform from [GitHub Releases](https://github.com/serialexp/my-docs/releases), then:
+### Quick install (recommended)
 
 ```bash
-# macOS/Linux
-chmod +x my-docs-*
-sudo mv my-docs-* /usr/local/bin/my-docs
-
-# Verify
-my-docs help
+curl -fsSL https://raw.githubusercontent.com/serialexp/my-docs/main/install.sh | bash
 ```
+
+This automatically detects your platform, downloads the latest release, and installs it.
 
 ### Using Go
 

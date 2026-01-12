@@ -52,6 +52,10 @@ my-docs rust alacritty_terminal KeyboardModes
 This automatically resolves the crate to its GitHub repository (cached for future use).
 If the symbol appears in multiple files, you'll get a list of cat commands to run.
 
+### Important
+
+NEVER use ` + "`2>/dev/null`" + ` or ` + "`2>&1`" + ` when running ` + "`my-docs`" + ` commands. If the command fails or returns empty output, you need to see the error message to understand why. Empty output with suppressed stderr likely means the tool is not installed - do NOT try to work around this by setting up aliases or retrying.
+
 ### Tips
 
 - Search specific repo: ` + "`my-docs search grafana/alloy \"exporter\"`" + `
