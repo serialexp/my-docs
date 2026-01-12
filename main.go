@@ -53,6 +53,8 @@ Usage:
 
 Commands:
   search [owner/repo] <pattern>  Search repo via grep.app (omit repo to search all)
+    --limit N                    Max results to show (default: 15)
+    --offset N                   Skip first N results (for pagination)
   cat <owner/repo> <path>        Fetch and display file from GitHub
   find <query>                   Search for repos by name
   rust <crate> <symbol>          Look up a Rust crate symbol and show its source
@@ -105,24 +107,47 @@ func runFind(args []string) {
 }
 
 func runSearch(args []string) {
-	if len(args) < 1 || len(args) > 2 {
-		fmt.Fprintln(os.Stderr, "usage: my-docs search [owner/repo] <pattern>")
+	// Default pagination
+	limit := 15
+	offset := 0
+
+	// Parse flags manually (before positional args)
+	var positionalArgs []string
+	for i := 0; i < len(args); i++ {
+		switch {
+		case args[i] == "--limit" && i+1 < len(args):
+			fmt.Sscanf(args[i+1], "%d", &limit)
+			i++
+		case args[i] == "--offset" && i+1 < len(args):
+			fmt.Sscanf(args[i+1], "%d", &offset)
+			i++
+		case strings.HasPrefix(args[i], "--limit="):
+			fmt.Sscanf(args[i], "--limit=%d", &limit)
+		case strings.HasPrefix(args[i], "--offset="):
+			fmt.Sscanf(args[i], "--offset=%d", &offset)
+		default:
+			positionalArgs = append(positionalArgs, args[i])
+		}
+	}
+
+	if len(positionalArgs) < 1 || len(positionalArgs) > 2 {
+		fmt.Fprintln(os.Stderr, "usage: my-docs search [owner/repo] <pattern> [--limit N] [--offset N]")
 		os.Exit(1)
 	}
 
 	var repo, pattern string
-	if len(args) == 1 {
+	if len(positionalArgs) == 1 {
 		// No repo specified, search across all repos
-		pattern = args[0]
+		pattern = positionalArgs[0]
 		repo = ""
 	} else {
 		// Repo specified in owner/repo format
-		repo = args[0]
+		repo = positionalArgs[0]
 		if !strings.Contains(repo, "/") {
 			fmt.Fprintf(os.Stderr, "error: invalid repo format %q: must be owner/repo\n", repo)
 			os.Exit(1)
 		}
-		pattern = args[1]
+		pattern = positionalArgs[1]
 	}
 
 	resp, err := grepapp.Search(pattern, repo)
@@ -134,11 +159,41 @@ func runSearch(args []string) {
 		fmt.Println("No matches found")
 		return
 	}
+
+	// Collect all match lines
+	type matchLine struct {
+		path string
+		line int
+		text string
+	}
+	var allMatches []matchLine
 	for _, hit := range resp.Hits.Hits {
 		matches := grepapp.ExtractText(hit.Content.Snippet)
 		for _, m := range matches {
-			fmt.Printf("%s:%d: %s\n", hit.Path, m.Line, m.Text)
+			allMatches = append(allMatches, matchLine{hit.Path, m.Line, m.Text})
 		}
+	}
+
+	// Apply offset and limit
+	total := len(allMatches)
+	if offset >= total {
+		fmt.Println("No more results")
+		return
+	}
+	end := offset + limit
+	if end > total {
+		end = total
+	}
+	displayed := allMatches[offset:end]
+
+	for _, m := range displayed {
+		fmt.Printf("%s:%d: %s\n", m.path, m.line, m.text)
+	}
+
+	// Show remaining count
+	remaining := total - end
+	if remaining > 0 {
+		fmt.Printf("\n... and %d more results (use --offset %d to see next page)\n", remaining, end)
 	}
 }
 

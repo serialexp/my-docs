@@ -102,18 +102,26 @@ install_unix() {
     echo ""
     echo "  Binary installed to: ${bin_dir}/${APP_NAME}"
     echo ""
-    echo "  Next steps:"
-    echo "    1. Run '${APP_NAME} install' to register with Claude Code"
-    echo "       This allows Claude to access documentation from any repo"
+
+    # Ask if user wants to install Claude instructions
+    echo "  Would you like to install my-docs instructions into ~/.claude/CLAUDE.md?"
+    echo "  This allows Claude Code to use my-docs for documentation lookups."
     echo ""
-    echo "    2. Set up your first repo:"
-    echo "       ${APP_NAME} find <query>          # Search for repos"
-    echo "       ${APP_NAME} alias <name> <repo>   # Create repo alias"
+    read -p "  Install Claude instructions? [Y/n] " -n 1 -r
     echo ""
-    echo "  Other commands:"
-    echo "    ${APP_NAME} search <repo> <pattern> # Search repo contents"
-    echo "    ${APP_NAME} cat <repo> <path>       # Read files from repo"
-    echo "    ${APP_NAME} help                    # Show all commands"
+    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+        "${bin_dir}/${APP_NAME}" install
+    else
+        echo ""
+        echo "  Skipped. You can run '${APP_NAME} install' later to add Claude instructions."
+    fi
+
+    echo ""
+    echo "  Commands:"
+    echo "    ${APP_NAME} find <query>                  # Search for repos"
+    echo "    ${APP_NAME} search <owner/repo> <pattern> # Search repo contents"
+    echo "    ${APP_NAME} cat <owner/repo> <path>       # Read files from repo"
+    echo "    ${APP_NAME} help                          # Show all commands"
     echo ""
 }
 

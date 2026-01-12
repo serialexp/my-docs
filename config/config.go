@@ -1,4 +1,4 @@
-// ABOUTME: Manages the JSON config file for repo aliases.
+// ABOUTME: Manages the JSON config file for crate-to-repo mappings.
 // ABOUTME: Handles loading, saving, and locating the config file.
 
 package config
@@ -10,7 +10,6 @@ import (
 )
 
 type Config struct {
-	Repos  map[string]string `json:"repos"`
 	Crates map[string]string `json:"crates,omitempty"`
 }
 
@@ -18,7 +17,6 @@ func Load(path string) (*Config, error) {
 	data, err := os.ReadFile(path)
 	if os.IsNotExist(err) {
 		return &Config{
-			Repos:  make(map[string]string),
 			Crates: make(map[string]string),
 		}, nil
 	}
@@ -29,9 +27,6 @@ func Load(path string) (*Config, error) {
 	var cfg Config
 	if err := json.Unmarshal(data, &cfg); err != nil {
 		return nil, err
-	}
-	if cfg.Repos == nil {
-		cfg.Repos = make(map[string]string)
 	}
 	if cfg.Crates == nil {
 		cfg.Crates = make(map[string]string)

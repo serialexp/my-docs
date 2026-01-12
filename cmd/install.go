@@ -54,7 +54,7 @@ If the symbol appears in multiple files, you'll get a list of cat commands to ru
 
 ### Important
 
-NEVER use ` + "`2>/dev/null`" + ` or ` + "`2>&1`" + ` when running ` + "`my-docs`" + ` commands. If the command fails or returns empty output, you need to see the error message to understand why. Empty output with suppressed stderr likely means the tool is not installed - do NOT try to work around this by setting up aliases or retrying.
+NEVER use ` + "`2>/dev/null`" + ` or ` + "`2>&1`" + ` when running ` + "`my-docs`" + ` commands. If the command fails or returns empty output, you need to see the error message to understand why. Empty output with suppressed stderr likely means the tool is not installed.
 
 ### Tips
 

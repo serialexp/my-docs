@@ -14,7 +14,6 @@ When working with AI agents, they need access to documentation to work effective
 A CLI that:
 1. **Searches** via grep.app's API (fast, indexed)
 2. **Reads files** via raw.githubusercontent.com
-3. **Maps short names** to full repo paths via config
 
 ## Installation
 
@@ -51,28 +50,16 @@ my-docs find alloy
 # grafana/alloy (2233 matches)
 # alloy-rs/alloy (430 matches)
 
-# Create an alias
-my-docs alias alloy grafana/alloy
-
-# Search for patterns
-my-docs search alloy "prometheus.exporter"
+# Search for patterns (use owner/repo format)
+my-docs search grafana/alloy "prometheus.exporter"
 # internal/component/prometheus/exporter/self/self.go:14: Name: "prometheus.exporter.self",
 
 # Read specific files
-my-docs cat alloy README.md
+my-docs cat grafana/alloy README.md
 
 # Look up Rust crate symbols
 my-docs rust alacritty_terminal KeyboardModes
 # (outputs the file containing KeyboardModes, or lists files if multiple matches)
-
-# List configured aliases
-my-docs list
-
-# Remove an alias
-my-docs remove alloy
-
-# Show config file location
-my-docs config
 
 # Install instructions into ~/.claude/CLAUDE.md for AI agents
 my-docs install
@@ -83,27 +70,10 @@ my-docs install
 | Command | Description |
 |---------|-------------|
 | `find <query>` | Search for repos by name |
-| `alias <name> <owner/repo>` | Create alias for a repo |
-| `search <repo> <pattern>` | Search repo via grep.app |
-| `cat <repo> <path>` | Fetch and display file from GitHub |
+| `search [owner/repo] <pattern>` | Search repo via grep.app (omit repo to search all) |
+| `cat <owner/repo> <path>` | Fetch and display file from GitHub |
 | `rust <crate> <symbol>` | Look up a Rust crate symbol and show its source |
-| `list` | Show all configured repo aliases |
-| `remove <name>` | Remove a repo alias |
-| `config` | Show config file path |
 | `install` | Install instructions into ~/.claude/CLAUDE.md |
-
-## Config
-
-Aliases are stored in `~/.config/my-docs/config.json`:
-
-```json
-{
-  "repos": {
-    "alloy": "grafana/alloy",
-    "otel": "open-telemetry/opentelemetry-collector"
-  }
-}
-```
 
 ## For AI Agents
 
