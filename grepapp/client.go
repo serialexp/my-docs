@@ -63,7 +63,7 @@ func BuildURL(query, repo string) string {
 	params.Set("q", query)
 	params.Set("regexp", "true")
 	if repo != "" {
-		params.Set("f.repo", repo)
+		params.Set("f.repo.pattern", repo)
 	}
 	return baseURL + "?" + params.Encode()
 }

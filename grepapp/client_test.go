@@ -98,8 +98,8 @@ func TestBuildURL(t *testing.T) {
 		if !strings.Contains(got, "q=prometheus") {
 			t.Errorf("BuildURL() missing q param: %q", got)
 		}
-		if !strings.Contains(got, "f.repo=grafana%2Falloy") {
-			t.Errorf("BuildURL() missing f.repo param: %q", got)
+		if !strings.Contains(got, "f.repo.pattern=grafana%2Falloy") {
+			t.Errorf("BuildURL() missing f.repo.pattern param: %q", got)
 		}
 	})
 
