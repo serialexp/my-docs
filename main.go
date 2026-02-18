@@ -32,6 +32,8 @@ func main() {
 		runSearch(args)
 	case "cat":
 		runCat(args)
+	case "info":
+		runInfo(args)
 	case "rust":
 		runRust(args)
 	case "install":
@@ -56,6 +58,7 @@ Commands:
     --limit N                    Max results to show (default: 15)
     --offset N                   Skip first N results (for pagination)
   cat <owner/repo> <path>        Fetch and display file from GitHub
+  info <owner/repo>              Show repo info (llms.txt or README.md)
   find <query>                   Search for repos by name
   rust <crate> <symbol>          Look up a Rust crate symbol and show its source
   install                        Install instructions into ~/.claude/CLAUDE.md`)
@@ -208,6 +211,24 @@ func runCat(args []string) {
 		os.Exit(1)
 	}
 	content, err := github.FetchFile(repo, args[1])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Print(content)
+}
+
+func runInfo(args []string) {
+	if len(args) != 1 {
+		fmt.Fprintln(os.Stderr, "usage: my-docs info <owner/repo>")
+		os.Exit(1)
+	}
+	repo := args[0]
+	if !strings.Contains(repo, "/") {
+		fmt.Fprintf(os.Stderr, "error: invalid repo format %q: must be owner/repo\n", repo)
+		os.Exit(1)
+	}
+	content, err := github.FetchRepoInfo(repo)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)

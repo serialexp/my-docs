@@ -25,14 +25,17 @@ Use ` + "`my-docs`" + ` when you need to:
 
 ### Workflow
 
-1. **First time using a library?** Find available repos:
-   ` + "`my-docs find opentelemetry`" + ` → discover available repos
+1. **Not sure about the exact repo name?** Find it first:
+   ` + "`my-docs find opentelemetry`" + ` → discover available repos (returns owner/repo names)
 
-2. **Need to find something?** Search the repo:
+2. **First time using a library?** Get a quick overview:
+   ` + "`my-docs info grafana/alloy`" + ` → fetch the repo's llms.txt (or README if unavailable)
+
+3. **Need to find something?** Search the repo:
    ` + "`my-docs search open-telemetry/opentelemetry-collector \"processor.*metrics\"`" + ` → find metrics processor code
    Returns: file paths with line numbers showing matches
 
-3. **Want to read a specific file?** Fetch it directly:
+4. **Want to read a specific file?** Fetch it directly:
    ` + "`my-docs cat open-telemetry/opentelemetry-collector docs/configuration.md`" + ` → read configuration docs
    ` + "`my-docs cat open-telemetry/opentelemetry-collector processor/metrics/factory.go`" + ` → read source code
 
@@ -41,6 +44,7 @@ Use ` + "`my-docs`" + ` when you need to:
 - ` + "`my-docs find <query>`" + ` - Search GitHub for repos matching query
 - ` + "`my-docs search [owner/repo] <pattern>`" + ` - Search repo contents (supports regex). Repo should be in owner/repo format, or omitted to search all repos
 - ` + "`my-docs cat <owner/repo> <path>`" + ` - Fetch and display file contents
+- ` + "`my-docs info <owner/repo>`" + ` - Show repo overview (prefers llms.txt, falls back to README.md)
 - ` + "`my-docs rust <crate> <symbol>`" + ` - Look up a Rust crate symbol and show its source
 
 ### Rust Crates
