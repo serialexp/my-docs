@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 )
 
 const rawBaseURL = "https://raw.githubusercontent.com"
@@ -21,6 +22,17 @@ func BuildRawURL(repo, branch, path string) string {
 
 func FetchFile(repo, path string) (string, error) {
 	branches := []string{"main", "master"}
+	base := cacheDir()
+
+	// Check cache for each branch before making any HTTP requests
+	if base != "" {
+		for _, branch := range branches {
+			cp := cachePath(base, repo, branch, path)
+			if content, ok := readCache(cp); ok {
+				return content, nil
+			}
+		}
+	}
 
 	var lastErr error
 	for _, branch := range branches {
@@ -46,8 +58,45 @@ func FetchFile(repo, path string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		return string(body), nil
+
+		content := string(body)
+		if base != "" {
+			writeCache(cachePath(base, repo, branch, path), content)
+		}
+		return content, nil
 	}
 
 	return "", fmt.Errorf("could not fetch %s/%s: %v", repo, path, lastErr)
+}
+
+// FetchRepoInfo fetches llms.txt and README.md concurrently, preferring llms.txt.
+func FetchRepoInfo(repo string) (string, error) {
+	type result struct {
+		content string
+		err     error
+	}
+
+	var (
+		llms, readme result
+		wg           sync.WaitGroup
+	)
+
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		llms.content, llms.err = FetchFile(repo, "llms.txt")
+	}()
+	go func() {
+		defer wg.Done()
+		readme.content, readme.err = FetchFile(repo, "README.md")
+	}()
+	wg.Wait()
+
+	if llms.err == nil {
+		return llms.content, nil
+	}
+	if readme.err == nil {
+		return readme.content, nil
+	}
+	return "", fmt.Errorf("could not fetch repo info for %s: no llms.txt or README.md found", repo)
 }
