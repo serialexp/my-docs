@@ -38,6 +38,8 @@ func main() {
 		runRust(args)
 	case "install":
 		runInstall()
+	case "_clone":
+		runCloneCmd(args)
 	case "help", "-h", "--help":
 		usage()
 	default:
@@ -290,6 +292,20 @@ func runRust(args []string) {
 	} else {
 		// Multiple files - show cat commands
 		fmt.Print(cmd.FormatMultipleMatches(symbol, repo, files))
+	}
+}
+
+func runCloneCmd(args []string) {
+	if len(args) != 1 {
+		os.Exit(1)
+	}
+	repo := args[0]
+	if !strings.Contains(repo, "/") {
+		os.Exit(1)
+	}
+	if err := github.RunClone(repo); err != nil {
+		fmt.Fprintf(os.Stderr, "clone failed: %v\n", err)
+		os.Exit(1)
 	}
 }
 

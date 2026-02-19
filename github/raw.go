@@ -21,6 +21,16 @@ func BuildRawURL(repo, branch, path string) string {
 }
 
 func FetchFile(repo, path string) (string, error) {
+	// Try local clone first if available
+	if cloneReady(repo) {
+		pullIfStale(repo)
+		content, err := readLocalFile(repo, path)
+		if err == nil {
+			return content, nil
+		}
+		// Fall through to HTTP if file not found in clone
+	}
+
 	branches := []string{"main", "master"}
 	base := cacheDir()
 
@@ -63,6 +73,7 @@ func FetchFile(repo, path string) (string, error) {
 		if base != "" {
 			writeCache(cachePath(base, repo, branch, path), content)
 		}
+		maybeTriggerClone(repo)
 		return content, nil
 	}
 
