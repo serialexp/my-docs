@@ -9,7 +9,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
-	"syscall"
 	"time"
 )
 
@@ -183,7 +182,7 @@ func spawnClone(repo string) {
 	}
 
 	cmd := exec.Command(exe, "_clone", repo)
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
+	cmd.SysProcAttr = detachedProcAttr()
 	cmd.Stdout = nil
 	cmd.Stderr = nil
 	cmd.Stdin = nil
