@@ -39,7 +39,7 @@ Note: Requires `~/go/bin` in your PATH.
 git clone https://github.com/serialexp/my-docs
 cd my-docs
 go build
-sudo cp my-docs /usr/local/bin/
+cp my-docs ~/.local/bin/
 ```
 
 ## Usage

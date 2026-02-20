@@ -59,26 +59,50 @@ install_unix() {
     local tmp_dir
     tmp_dir=$(mktemp -d)
 
-    # Determine install location before checking PATH
-    local bin_dir
-    if [[ -w "/usr/local/bin" ]]; then
-        bin_dir="/usr/local/bin"
-    else
-        bin_dir="${HOME}/.local/bin"
-        mkdir -p "$bin_dir"
+    local bin_dir="${HOME}/.local/bin"
+    mkdir -p "$bin_dir"
 
-        # Check if ~/.local/bin is in PATH and warn early
-        if [[ ":$PATH:" != *":${bin_dir}:"* ]]; then
-            warn "${bin_dir} is not in your PATH"
+    # Check if ~/.local/bin is in PATH and offer to add it
+    if [[ ":$PATH:" != *":${bin_dir}:"* ]]; then
+        warn "${bin_dir} is not in your PATH"
+        echo ""
+
+        local path_line='export PATH="$HOME/.local/bin:$PATH"'
+        local shell_configs=()
+
+        # Detect which shell configs exist
+        [[ -f "${HOME}/.zshrc" ]] && shell_configs+=("${HOME}/.zshrc")
+        [[ -f "${HOME}/.bashrc" ]] && shell_configs+=("${HOME}/.bashrc")
+        [[ -f "${HOME}/.bash_profile" ]] && shell_configs+=("${HOME}/.bash_profile")
+
+        if [[ ${#shell_configs[@]} -gt 0 ]]; then
+            echo "  Found shell config(s): ${shell_configs[*]}"
             echo ""
-            echo "  The binary will be installed to ${bin_dir}, but this directory is not in your PATH."
-            echo "  Add it to your PATH by adding this line to your shell config (~/.bashrc, ~/.zshrc, etc):"
+            read -p "  Add ~/.local/bin to PATH in these files? [Y/n] " -n 1 -r
             echo ""
-            echo "    export PATH=\"\$HOME/.local/bin:\$PATH\""
-            echo ""
-            echo "  Then reload your shell with: source ~/.bashrc (or ~/.zshrc)"
-            echo ""
-            read -p "Press Enter to continue with installation..."
+
+            if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+                for rc in "${shell_configs[@]}"; do
+                    if ! grep -qF '/.local/bin' "$rc"; then
+                        echo "" >> "$rc"
+                        echo "$path_line" >> "$rc"
+                        info "Added PATH to ${rc}"
+                    else
+                        info "${rc} already contains .local/bin"
+                    fi
+                done
+                echo ""
+                echo "  Restart your shell or run: source ${shell_configs[0]}"
+                echo ""
+            else
+                echo ""
+                echo "  You can add it manually later:"
+                echo "    $path_line"
+                echo ""
+            fi
+        else
+            echo "  No shell config found. Add this to your shell config:"
+            echo "    $path_line"
             echo ""
         fi
     fi

@@ -16,6 +16,8 @@ import (
 	"github.com/bartriepe/my-docs/grepapp"
 )
 
+var version = "dev"
+
 func main() {
 	if len(os.Args) < 2 {
 		usage()
@@ -40,6 +42,8 @@ func main() {
 		runInstall()
 	case "_clone":
 		runCloneCmd(args)
+	case "version", "-v", "--version":
+		fmt.Println(version)
 	case "help", "-h", "--help":
 		usage()
 	default:
