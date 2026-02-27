@@ -64,6 +64,7 @@ Commands:
     --limit N                    Max results to show (default: 15)
     --offset N                   Skip first N results (for pagination)
   cat <owner/repo> <path>        Fetch and display file from GitHub
+    --lines N or N-M             Show only specific lines (e.g., --lines 10-50)
   info <owner/repo>              Show repo info (llms.txt or README.md)
   find <query>                   Search for repos by name
   rust <crate> <symbol>          Look up a Rust crate symbol and show its source
@@ -189,10 +190,7 @@ func runSearch(args []string) {
 		fmt.Println("No more results")
 		return
 	}
-	end := offset + limit
-	if end > total {
-		end = total
-	}
+	end := min(offset+limit, total)
 	displayed := allMatches[offset:end]
 
 	for _, m := range displayed {
@@ -207,21 +205,79 @@ func runSearch(args []string) {
 }
 
 func runCat(args []string) {
-	if len(args) != 2 {
-		fmt.Fprintln(os.Stderr, "usage: my-docs cat <owner/repo> <path>")
+	var lineRange string
+	var positionalArgs []string
+
+	for i := 0; i < len(args); i++ {
+		switch {
+		case args[i] == "--lines" && i+1 < len(args):
+			lineRange = args[i+1]
+			i++
+		case strings.HasPrefix(args[i], "--lines="):
+			lineRange = strings.TrimPrefix(args[i], "--lines=")
+		default:
+			positionalArgs = append(positionalArgs, args[i])
+		}
+	}
+
+	if len(positionalArgs) != 2 {
+		fmt.Fprintln(os.Stderr, "usage: my-docs cat <owner/repo> <path> [--lines START-END]")
 		os.Exit(1)
 	}
-	repo := args[0]
+	repo := positionalArgs[0]
 	if !strings.Contains(repo, "/") {
 		fmt.Fprintf(os.Stderr, "error: invalid repo format %q: must be owner/repo\n", repo)
 		os.Exit(1)
 	}
-	content, err := github.FetchFile(repo, args[1])
+	content, err := github.FetchFile(repo, positionalArgs[1])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
+
+	if lineRange != "" {
+		content, err = extractLines(content, lineRange)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
 	fmt.Print(content)
+}
+
+func extractLines(content, lineRange string) (string, error) {
+	var start, end int
+	if n, _ := fmt.Sscanf(lineRange, "%d-%d", &start, &end); n == 2 {
+		// range: 10-20
+	} else if n, _ := fmt.Sscanf(lineRange, "%d", &start); n == 1 {
+		// single line
+		end = start
+	} else {
+		return "", fmt.Errorf("invalid line range %q: use N or N-M", lineRange)
+	}
+
+	if start < 1 {
+		return "", fmt.Errorf("line numbers must be >= 1")
+	}
+	if end < start {
+		return "", fmt.Errorf("end line %d must be >= start line %d", end, start)
+	}
+
+	lines := strings.Split(content, "\n")
+	if start > len(lines) {
+		return "", fmt.Errorf("start line %d exceeds file length (%d lines)", start, len(lines))
+	}
+	if end > len(lines) {
+		end = len(lines)
+	}
+
+	selected := lines[start-1 : end]
+	result := strings.Join(selected, "\n")
+	if !strings.HasSuffix(result, "\n") {
+		result += "\n"
+	}
+	return result, nil
 }
 
 func runInfo(args []string) {

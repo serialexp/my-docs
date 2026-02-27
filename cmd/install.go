@@ -38,12 +38,13 @@ Use ` + "`my-docs`" + ` when you need to:
 4. **Want to read a specific file?** Fetch it directly:
    ` + "`my-docs cat open-telemetry/opentelemetry-collector docs/configuration.md`" + ` → read configuration docs
    ` + "`my-docs cat open-telemetry/opentelemetry-collector processor/metrics/factory.go`" + ` → read source code
+   ` + "`my-docs cat open-telemetry/opentelemetry-collector processor/metrics/factory.go --lines 10-50`" + ` → read specific lines
 
 ### Available commands
 
 - ` + "`my-docs find <query>`" + ` - Search GitHub for repos matching query
 - ` + "`my-docs search [owner/repo] <pattern>`" + ` - Search repo contents (supports regex). Repo should be in owner/repo format, or omitted to search all repos
-- ` + "`my-docs cat <owner/repo> <path>`" + ` - Fetch and display file contents
+- ` + "`my-docs cat <owner/repo> <path> [--lines N-M]`" + ` - Fetch and display file contents (optionally a line range)
 - ` + "`my-docs info <owner/repo>`" + ` - Show repo overview (prefers llms.txt, falls back to README.md)
 - ` + "`my-docs rust <crate> <symbol>`" + ` - Look up a Rust crate symbol and show its source
 
