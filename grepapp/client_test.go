@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestParseResponse(t *testing.T) {
@@ -109,6 +110,44 @@ func TestBuildURL(t *testing.T) {
 			t.Errorf("BuildURL() = %q, want q=hello+world", got)
 		}
 	})
+}
+
+func TestParseRetryAfter(t *testing.T) {
+	tests := []struct {
+		name   string
+		header string
+		want   time.Duration
+	}{
+		{
+			name:   "empty header uses default",
+			header: "",
+			want:   defaultRetryDelay,
+		},
+		{
+			name:   "seconds as integer",
+			header: "30",
+			want:   30 * time.Second,
+		},
+		{
+			name:   "zero seconds",
+			header: "0",
+			want:   0,
+		},
+		{
+			name:   "invalid value uses default",
+			header: "not-a-number",
+			want:   defaultRetryDelay,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := parseRetryAfter(tt.header)
+			if got != tt.want {
+				t.Errorf("parseRetryAfter(%q) = %v, want %v", tt.header, got, tt.want)
+			}
+		})
+	}
 }
 
 func TestExtractText(t *testing.T) {

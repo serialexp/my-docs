@@ -7,11 +7,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
+	"io"
 	"net/http"
 	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const baseURL = "https://grep.app/api/search"
@@ -68,31 +70,68 @@ func BuildURL(query, repo string) string {
 	return baseURL + "?" + params.Encode()
 }
 
+const maxRetries = 3
+const defaultRetryDelay = 10 * time.Second
+
 func Search(query, repo string) (*Response, error) {
 	searchURL := BuildURL(query, repo)
 
-	req, err := http.NewRequest("GET", searchURL, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("User-Agent", "my-docs/1.0")
+	for attempt := range maxRetries {
+		req, err := http.NewRequest("GET", searchURL, nil)
+		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("User-Agent", "my-docs/1.0")
 
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return nil, err
+		}
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("grep.app returned status %d", resp.StatusCode)
+		if resp.StatusCode == http.StatusTooManyRequests {
+			delay := parseRetryAfter(resp.Header.Get("Retry-After"))
+			resp.Body.Close()
+			if attempt == maxRetries-1 {
+				return nil, fmt.Errorf("grep.app rate limited (429) after %d retries", maxRetries)
+			}
+			fmt.Printf("grep.app rate limited, retrying in %s...\n", delay)
+			time.Sleep(delay)
+			continue
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			body, _ := io.ReadAll(resp.Body)
+			resp.Body.Close()
+			return nil, fmt.Errorf("grep.app returned status %d: %s", resp.StatusCode, string(body))
+		}
+
+		var result Response
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			resp.Body.Close()
+			return nil, err
+		}
+		resp.Body.Close()
+
+		return &result, nil
 	}
 
-	var result Response
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, err
-	}
+	return nil, fmt.Errorf("grep.app search failed after %d attempts", maxRetries)
+}
 
-	return &result, nil
+func parseRetryAfter(header string) time.Duration {
+	if header == "" {
+		return defaultRetryDelay
+	}
+	if seconds, err := strconv.Atoi(header); err == nil {
+		return time.Duration(seconds) * time.Second
+	}
+	if t, err := http.ParseTime(header); err == nil {
+		delay := time.Until(t)
+		if delay > 0 {
+			return delay
+		}
+	}
+	return defaultRetryDelay
 }
 
 var lineRegex = regexp.MustCompile(`data-line="(\d+)"`)
