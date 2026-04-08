@@ -12,7 +12,7 @@ const endMarker = "<!-- my-docs:end -->"
 
 const Instructions = `## my-docs
 
-You have access to the ` + "`my-docs`" + ` CLI tool for searching documentation across git repositories without cloning them locally.
+You have access to the ` + "`my-docs`" + ` CLI tool for searching documentation across git repositories. Repos are cloned locally (shallow, on first search) for fast regex search with ripgrep.
 
 ### When to use my-docs
 
@@ -33,7 +33,7 @@ Use ` + "`my-docs`" + ` when you need to:
 
 3. **Need to find something?** Search the repo:
    ` + "`my-docs search open-telemetry/opentelemetry-collector \"processor.*metrics\"`" + ` → find metrics processor code
-   Returns: file paths with line numbers showing matches
+   Returns: file paths with line numbers showing matches (full regex supported via ripgrep)
 
 4. **Want to read a specific file?** Fetch it directly:
    ` + "`my-docs cat open-telemetry/opentelemetry-collector docs/configuration.md`" + ` → read configuration docs

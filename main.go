@@ -1,5 +1,5 @@
 // ABOUTME: CLI entry point for my-docs.
-// ABOUTME: Searches documentation across git repositories without cloning them locally.
+// ABOUTME: Searches documentation across git repositories using local shallow clones and ripgrep.
 
 package main
 
@@ -13,7 +13,7 @@ import (
 	"github.com/bartriepe/my-docs/config"
 	"github.com/bartriepe/my-docs/cratesio"
 	"github.com/bartriepe/my-docs/github"
-	"github.com/bartriepe/my-docs/grepapp"
+	"github.com/bartriepe/my-docs/githubsearch"
 )
 
 var version = "dev"
@@ -60,7 +60,8 @@ Usage:
   my-docs <command> [arguments]
 
 Commands:
-  search [owner/repo] <pattern>  Search repo via grep.app (omit repo to search all)
+  search [owner/repo] <pattern>  Search repo locally with ripgrep (clones on first use)
+                                 Omit repo to search across GitHub with code search
     --limit N                    Max results to show (default: 15)
     --offset N                   Skip first N results (for pagination)
   cat <owner/repo> <path>        Fetch and display file from GitHub
@@ -102,17 +103,21 @@ func runFind(args []string) {
 		fmt.Fprintln(os.Stderr, "usage: my-docs find <query>")
 		os.Exit(1)
 	}
-	resp, err := grepapp.Search(args[0], "")
+	resp, err := githubsearch.SearchRepos(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
-	if len(resp.Facets.Repo.Buckets) == 0 {
+	if len(resp.Items) == 0 {
 		fmt.Println("No repositories found")
 		return
 	}
-	for _, bucket := range resp.Facets.Repo.Buckets {
-		fmt.Printf("%s (%d matches)\n", bucket.Val, bucket.Count)
+	for _, r := range resp.Items {
+		if r.Description != "" {
+			fmt.Printf("%s (★ %d) - %s\n", r.FullName, r.Stars, r.Description)
+		} else {
+			fmt.Printf("%s (★ %d)\n", r.FullName, r.Stars)
+		}
 	}
 }
 
@@ -160,47 +165,83 @@ func runSearch(args []string) {
 		pattern = positionalArgs[1]
 	}
 
-	resp, err := grepapp.Search(pattern, repo)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
-	}
-	if len(resp.Hits.Hits) == 0 {
-		fmt.Println("No matches found")
-		return
-	}
-
-	// Collect all match lines
-	type matchLine struct {
-		path string
-		line int
-		text string
-	}
-	var allMatches []matchLine
-	for _, hit := range resp.Hits.Hits {
-		matches := grepapp.ExtractText(hit.Content.Snippet)
-		for _, m := range matches {
-			allMatches = append(allMatches, matchLine{hit.Path, m.Line, m.Text})
+	if repo != "" {
+		// Specific repo: clone locally and search with ripgrep (full regex support)
+		if err := github.EnsureClone(repo); err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
 		}
-	}
 
-	// Apply offset and limit
-	total := len(allMatches)
-	if offset >= total {
-		fmt.Println("No more results")
-		return
-	}
-	end := min(offset+limit, total)
-	displayed := allMatches[offset:end]
+		allMatches, err := github.SearchLocal(repo, pattern)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
 
-	for _, m := range displayed {
-		fmt.Printf("%s:%d: %s\n", m.path, m.line, m.text)
-	}
+		if len(allMatches) == 0 {
+			fmt.Println("No matches found")
+			return
+		}
 
-	// Show remaining count
-	remaining := total - end
-	if remaining > 0 {
-		fmt.Printf("\n... and %d more results (use --offset %d to see next page)\n", remaining, end)
+		// Apply offset and limit
+		total := len(allMatches)
+		if offset >= total {
+			fmt.Println("No more results")
+			return
+		}
+		end := offset + limit
+		if end > total {
+			end = total
+		}
+
+		for _, m := range allMatches[offset:end] {
+			fmt.Printf("%s:%d: %s\n", m.Path, m.Line, m.Text)
+		}
+
+		remaining := total - end
+		if remaining > 0 {
+			fmt.Printf("\n... and %d more results (use --offset %d to see next page)\n", remaining, end)
+		}
+	} else {
+		// No repo specified: search across all repos via GitHub code search
+		resp, err := githubsearch.Search(pattern, "")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
+
+		results := githubsearch.ExtractResults(resp)
+		if len(results) == 0 {
+			fmt.Println("No matches found")
+			return
+		}
+
+		// Apply offset and limit
+		total := len(results)
+		if offset >= total {
+			fmt.Println("No more results")
+			return
+		}
+		end := offset + limit
+		if end > total {
+			end = total
+		}
+
+		for _, r := range results[offset:end] {
+			if r.Fragment != "" {
+				fmt.Printf("[%s] %s:\n", r.Repo, r.Path)
+				for _, line := range strings.Split(r.Fragment, "\n") {
+					fmt.Printf("  %s\n", line)
+				}
+			} else {
+				fmt.Printf("[%s] %s\n", r.Repo, r.Path)
+			}
+		}
+
+		remaining := total - end
+		if remaining > 0 {
+			fmt.Printf("\n... and %d more results (use --offset %d to see next page)\n", remaining, end)
+		}
 	}
 }
 
@@ -327,19 +368,32 @@ func runRust(args []string) {
 		saveConfig(cfg)
 	}
 
-	// Search for the symbol in the repo
-	resp, err := grepapp.Search(symbol, repo)
+	// Clone the repo and search locally for the symbol
+	if err := github.EnsureClone(repo); err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	matches, err := github.SearchLocal(repo, symbol)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
 
-	if len(resp.Hits.Hits) == 0 {
+	// Collect unique file paths from matches
+	seen := make(map[string]bool)
+	var files []string
+	for _, m := range matches {
+		if !seen[m.Path] {
+			seen[m.Path] = true
+			files = append(files, m.Path)
+		}
+	}
+
+	if len(files) == 0 {
 		fmt.Print(cmd.FormatNoMatches(symbol, crateName))
 		os.Exit(1)
 	}
-
-	files := cmd.CollectMatchingFiles(resp.Hits.Hits)
 
 	if len(files) == 1 {
 		// Single file - fetch and output it

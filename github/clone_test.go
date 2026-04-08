@@ -1,5 +1,5 @@
-// ABOUTME: Tests for automatic local git clone management.
-// ABOUTME: Covers access counting, clone detection, local file reads, and path construction.
+// ABOUTME: Tests for local git clone management.
+// ABOUTME: Covers clone detection, local file reads, staleness checks, and path construction.
 
 package github
 
@@ -10,24 +10,20 @@ import (
 	"time"
 )
 
-func withTestDirs(t *testing.T) (reposBase, countsBase string, cleanup func()) {
+func withTestDirs(t *testing.T) (reposBase string, cleanup func()) {
 	t.Helper()
 	reposBase = t.TempDir()
-	countsBase = t.TempDir()
 
 	origRepos := reposDirFn
-	origCounts := countsDirFn
 	reposDirFn = func() string { return reposBase }
-	countsDirFn = func() string { return countsBase }
 
-	return reposBase, countsBase, func() {
+	return reposBase, func() {
 		reposDirFn = origRepos
-		countsDirFn = origCounts
 	}
 }
 
 func TestClonePath(t *testing.T) {
-	reposBase, _, cleanup := withTestDirs(t)
+	reposBase, cleanup := withTestDirs(t)
 	defer cleanup()
 
 	got := clonePath("grafana/alloy")
@@ -38,7 +34,7 @@ func TestClonePath(t *testing.T) {
 }
 
 func TestCloneTmpPath(t *testing.T) {
-	reposBase, _, cleanup := withTestDirs(t)
+	reposBase, cleanup := withTestDirs(t)
 	defer cleanup()
 
 	got := cloneTmpPath("grafana/alloy")
@@ -49,7 +45,7 @@ func TestCloneTmpPath(t *testing.T) {
 }
 
 func TestCloneReady_NoDir(t *testing.T) {
-	_, _, cleanup := withTestDirs(t)
+	_, cleanup := withTestDirs(t)
 	defer cleanup()
 
 	if cloneReady("grafana/alloy") {
@@ -58,7 +54,7 @@ func TestCloneReady_NoDir(t *testing.T) {
 }
 
 func TestCloneReady_WithGitDir(t *testing.T) {
-	reposBase, _, cleanup := withTestDirs(t)
+	reposBase, cleanup := withTestDirs(t)
 	defer cleanup()
 
 	gitDir := filepath.Join(reposBase, "grafana", "alloy", ".git")
@@ -72,7 +68,7 @@ func TestCloneReady_WithGitDir(t *testing.T) {
 }
 
 func TestCloneInProgress_TmpExists(t *testing.T) {
-	reposBase, _, cleanup := withTestDirs(t)
+	reposBase, cleanup := withTestDirs(t)
 	defer cleanup()
 
 	tmpDir := filepath.Join(reposBase, "grafana", "alloy.tmp")
@@ -86,7 +82,7 @@ func TestCloneInProgress_TmpExists(t *testing.T) {
 }
 
 func TestCloneInProgress_NoTmp(t *testing.T) {
-	_, _, cleanup := withTestDirs(t)
+	_, cleanup := withTestDirs(t)
 	defer cleanup()
 
 	if cloneInProgress("grafana/alloy") {
@@ -94,70 +90,8 @@ func TestCloneInProgress_NoTmp(t *testing.T) {
 	}
 }
 
-func TestIncrementCount_NewRepo(t *testing.T) {
-	_, countsBase, cleanup := withTestDirs(t)
-	defer cleanup()
-
-	got := incrementCount("grafana/alloy")
-	if got != 1 {
-		t.Errorf("incrementCount() = %d, want 1", got)
-	}
-
-	data, err := os.ReadFile(filepath.Join(countsBase, "grafana", "alloy"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if string(data) != "1" {
-		t.Errorf("count file contains %q, want %q", string(data), "1")
-	}
-}
-
-func TestIncrementCount_ExistingCount(t *testing.T) {
-	_, countsBase, cleanup := withTestDirs(t)
-	defer cleanup()
-
-	path := filepath.Join(countsBase, "grafana", "alloy")
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(path, []byte("3"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-
-	got := incrementCount("grafana/alloy")
-	if got != 4 {
-		t.Errorf("incrementCount() = %d, want 4", got)
-	}
-
-	data, err := os.ReadFile(path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if string(data) != "4" {
-		t.Errorf("count file contains %q, want %q", string(data), "4")
-	}
-}
-
-func TestIncrementCount_CorruptFile(t *testing.T) {
-	_, countsBase, cleanup := withTestDirs(t)
-	defer cleanup()
-
-	path := filepath.Join(countsBase, "grafana", "alloy")
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(path, []byte("garbage"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-
-	got := incrementCount("grafana/alloy")
-	if got != 1 {
-		t.Errorf("incrementCount() = %d, want 1 (corrupt file treated as 0)", got)
-	}
-}
-
 func TestReadLocalFile_Success(t *testing.T) {
-	reposBase, _, cleanup := withTestDirs(t)
+	reposBase, cleanup := withTestDirs(t)
 	defer cleanup()
 
 	filePath := filepath.Join(reposBase, "owner", "repo", "docs", "readme.md")
@@ -179,7 +113,7 @@ func TestReadLocalFile_Success(t *testing.T) {
 }
 
 func TestReadLocalFile_NotFound(t *testing.T) {
-	_, _, cleanup := withTestDirs(t)
+	_, cleanup := withTestDirs(t)
 	defer cleanup()
 
 	_, err := readLocalFile("owner/repo", "nonexistent.md")
@@ -189,7 +123,7 @@ func TestReadLocalFile_NotFound(t *testing.T) {
 }
 
 func TestIsCloneStale_NoMarker(t *testing.T) {
-	reposBase, _, cleanup := withTestDirs(t)
+	reposBase, cleanup := withTestDirs(t)
 	defer cleanup()
 
 	// Create a clone dir without .last-pull
@@ -204,14 +138,13 @@ func TestIsCloneStale_NoMarker(t *testing.T) {
 }
 
 func TestIsCloneStale_FreshMarker(t *testing.T) {
-	reposBase, _, cleanup := withTestDirs(t)
+	reposBase, cleanup := withTestDirs(t)
 	defer cleanup()
 
 	cloneDir := filepath.Join(reposBase, "owner", "repo")
 	if err := os.MkdirAll(cloneDir, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	// Touch .last-pull with current time
 	marker := filepath.Join(cloneDir, ".last-pull")
 	if err := os.WriteFile(marker, nil, 0o644); err != nil {
 		t.Fatal(err)
@@ -223,7 +156,7 @@ func TestIsCloneStale_FreshMarker(t *testing.T) {
 }
 
 func TestIsCloneStale_OldMarker(t *testing.T) {
-	reposBase, _, cleanup := withTestDirs(t)
+	reposBase, cleanup := withTestDirs(t)
 	defer cleanup()
 
 	cloneDir := filepath.Join(reposBase, "owner", "repo")
@@ -234,7 +167,6 @@ func TestIsCloneStale_OldMarker(t *testing.T) {
 	if err := os.WriteFile(marker, nil, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	// Set mtime to 48 hours ago
 	old := time.Now().Add(-48 * time.Hour)
 	if err := os.Chtimes(marker, old, old); err != nil {
 		t.Fatal(err)
@@ -246,7 +178,7 @@ func TestIsCloneStale_OldMarker(t *testing.T) {
 }
 
 func TestTouchLastPull(t *testing.T) {
-	reposBase, _, cleanup := withTestDirs(t)
+	reposBase, cleanup := withTestDirs(t)
 	defer cleanup()
 
 	cloneDir := filepath.Join(reposBase, "owner", "repo")
@@ -266,13 +198,78 @@ func TestTouchLastPull(t *testing.T) {
 	}
 }
 
-func TestCountPath(t *testing.T) {
-	_, countsBase, cleanup := withTestDirs(t)
+func TestCanSearchLocal(t *testing.T) {
+	reposBase, cleanup := withTestDirs(t)
 	defer cleanup()
 
-	got := countPath("grafana/alloy")
-	want := filepath.Join(countsBase, "grafana/alloy")
-	if got != want {
-		t.Errorf("countPath() = %q, want %q", got, want)
+	if CanSearchLocal("owner/repo") {
+		t.Error("CanSearchLocal() returned true for non-existent clone")
+	}
+
+	gitDir := filepath.Join(reposBase, "owner", "repo", ".git")
+	if err := os.MkdirAll(gitDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	if !CanSearchLocal("owner/repo") {
+		t.Error("CanSearchLocal() returned false when clone exists")
+	}
+}
+
+func TestParseRipgrepOutput(t *testing.T) {
+	cloneDir := "/home/user/.cache/my-docs/repos/owner/repo"
+	output := `/home/user/.cache/my-docs/repos/owner/repo/src/main.go:42:func handleRequest() {
+/home/user/.cache/my-docs/repos/owner/repo/src/handler.go:10:import "net/http"
+/home/user/.cache/my-docs/repos/owner/repo/docs/api.md:5:The request handler processes incoming calls
+`
+	matches := parseRipgrepOutput(output, cloneDir)
+
+	if len(matches) != 3 {
+		t.Fatalf("parseRipgrepOutput() returned %d matches, want 3", len(matches))
+	}
+
+	want := []SearchMatch{
+		{Path: "src/main.go", Line: 42, Text: "func handleRequest() {"},
+		{Path: "src/handler.go", Line: 10, Text: `import "net/http"`},
+		{Path: "docs/api.md", Line: 5, Text: "The request handler processes incoming calls"},
+	}
+
+	for i, got := range matches {
+		if got.Path != want[i].Path {
+			t.Errorf("match[%d].Path = %q, want %q", i, got.Path, want[i].Path)
+		}
+		if got.Line != want[i].Line {
+			t.Errorf("match[%d].Line = %d, want %d", i, got.Line, want[i].Line)
+		}
+		if got.Text != want[i].Text {
+			t.Errorf("match[%d].Text = %q, want %q", i, got.Text, want[i].Text)
+		}
+	}
+}
+
+func TestParseRipgrepOutput_Empty(t *testing.T) {
+	matches := parseRipgrepOutput("", "/some/dir")
+	if len(matches) != 0 {
+		t.Errorf("parseRipgrepOutput() returned %d matches for empty output, want 0", len(matches))
+	}
+}
+
+func TestParseRipgrepOutput_ColonsInText(t *testing.T) {
+	cloneDir := "/cache/repos/owner/repo"
+	output := `/cache/repos/owner/repo/config.yaml:15:server: host:8080
+`
+	matches := parseRipgrepOutput(output, cloneDir)
+
+	if len(matches) != 1 {
+		t.Fatalf("parseRipgrepOutput() returned %d matches, want 1", len(matches))
+	}
+	if matches[0].Path != "config.yaml" {
+		t.Errorf("Path = %q, want %q", matches[0].Path, "config.yaml")
+	}
+	if matches[0].Line != 15 {
+		t.Errorf("Line = %d, want 15", matches[0].Line)
+	}
+	if matches[0].Text != "server: host:8080" {
+		t.Errorf("Text = %q, want %q", matches[0].Text, "server: host:8080")
 	}
 }

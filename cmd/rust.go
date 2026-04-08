@@ -1,28 +1,12 @@
 // ABOUTME: Logic for the rust command.
-// ABOUTME: Resolves Rust crate names to GitHub repos and searches for symbols.
+// ABOUTME: Formats output for Rust crate symbol lookups.
 
 package cmd
 
 import (
 	"fmt"
 	"strings"
-
-	"github.com/bartriepe/my-docs/grepapp"
 )
-
-func CollectMatchingFiles(hits []grepapp.Hit) []string {
-	seen := make(map[string]bool)
-	var files []string
-
-	for _, hit := range hits {
-		if !seen[hit.Path] {
-			seen[hit.Path] = true
-			files = append(files, hit.Path)
-		}
-	}
-
-	return files
-}
 
 func FormatMultipleMatches(symbol, repo string, files []string) string {
 	var sb strings.Builder

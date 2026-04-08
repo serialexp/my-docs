@@ -73,7 +73,6 @@ func FetchFile(repo, path string) (string, error) {
 		if base != "" {
 			writeCache(cachePath(base, repo, branch, path), content)
 		}
-		maybeTriggerClone(repo)
 		return content, nil
 	}
 
